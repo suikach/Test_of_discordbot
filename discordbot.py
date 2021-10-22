@@ -7,11 +7,19 @@ from discord.utils import get
 from discord import FFmpegPCMAudio
 from discord import TextChannel
 from youtube_dl import YoutubeDL
+from os import getenv
+import traceback
 
 load_dotenv()
 client = commands.Bot(command_prefix='.')  # prefix our commands with '.'
 
 players = {}
+
+@bot.event
+async def on_command_error(ctx, error):
+    orig_error = getattr(error, "original", error)
+    error_msg = ''.join(traceback.TracebackException.from_exception(orig_error).format())
+    await ctx.send(error_msg)
 
 
 @client.event  # check if bot is ready
@@ -90,3 +98,6 @@ async def clear(ctx, amount=5):
 
 
 client.run(os.getenv('TOKEN'))
+
+token = getenv('DISCORD_BOT_TOKEN')
+bot.run(token)
